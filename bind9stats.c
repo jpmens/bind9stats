@@ -165,28 +165,22 @@ void querystats_config()
 {
 	printf(
 		"graph_title BIND9 Queries by type\n"
-		"graph_category BIND9\n"
-		"A.label A\n"
-		"AAAA.label AAAA\n"
-		"AXFR.label AXFR\n"
-		"CNAME.label CNAME\n"
-		"DNAME.label DNAME\n"
-		"DNSKEY.label DNSKEY\n"
-		"DS.label DS\n"
-		"MX.label MX\n"
-		"NAPTR.label NAPTR\n"
-		"NS.label NS\n"
-		"NSEC.label NSEC\n"
-		"NSEC3.label NSEC3\n"
-		"PTR.label PTR\n"
-		"RRSIG.label RRSIG\n"
-		"SOA.label SOA\n"
-		"SRV.label SRV\n"
-		"SSHFP.label SSHFP\n"
-		"TLSA.label TLSA\n"
-		"TXT.label TXT\n"
-		"OTHER.label OTHER\n"
-		 );
+		"graph_category BIND9\n");
+	for (tp = types; tp && tp->qtype; tp++) {
+		printf("%s.type COUNTER\n", tp->qtype);
+		printf("%s.min 0\n", tp->qtype);
+		// printf("%s.draw STACK\n", tp->qtype);
+	}
+	printf("OTHER.type COUNTER\n");
+	printf("OTHER.min 0\n");
+	// printf("OTHER.draw STACK\n");
+
+
+	for (tp = types; tp && tp->qtype; tp++) {
+		printf("%s.label %s\n", tp->qtype, tp->qtype);
+	}
+	printf("OTHER.label OTHER\n");
+
 }
 
 void memstats_config()
@@ -194,23 +188,22 @@ void memstats_config()
 	printf(
 		"graph_title BIND9 Memory usage\n"
 		"graph_category BIND9\n"
-		"memstats.type GAUGE\n"
-		"memstats.label RAM usage\n"
-		"memstats.draw LINE1\n"
+		"totaluse.type GAUGE\n"
+		"totaluse.label Total RAM usage\n"
+		"inuse.label In use\n"
 		 );
 
 }
 
 void memstats(xmlDocPtr doc, xmlNodePtr cur, FILE *fp) 
 { 
-
         while (cur != NULL) { 
 
                 if (!strcmp(cur->name, "TotalUse")) { 
-			printf("memstats.totaluse %s\n", 
+			printf("totaluse.value %s\n", 
 				xmlNodeListGetString(doc, cur->xmlChildrenNode, 1)); 
 		} else if (!strcmp(cur->name, "InUse")) { 
-			printf("memstats.inuse %s\n", 
+			printf("inuse.value %s\n", 
 				xmlNodeListGetString(doc, cur->xmlChildrenNode, 1)); 
 		}
 
